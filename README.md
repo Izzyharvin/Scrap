@@ -26,3 +26,6 @@ Created a web app that lets users view manga from Crunchyroll using Mongoose and
 
 - Step 1: Once you see the manga you interested in the you click on it's name or picture then it will send you to the page source.
 ![Link to Source](/pictures/scrap_linktosource.png)
+
+Created by:
+Israel Harvin 8/29/2019
