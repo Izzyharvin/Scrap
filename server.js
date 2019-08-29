@@ -1,41 +1,77 @@
 var express = require("express");
-// var exphdbrs = require("express-handlebars");
+var logger = require("morgan");
 var mongoose = require("mongoose");
+
+
 var cheerio = require("cheerio");
 var axios = require("axios");
 
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
 
-// app.use(express.static("public"));
+var db = require("./models");
+
+var PORT = 3000;
+
+var app = express();
+
+
+app.use(logger("dev"));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use(express.static("public"));
 
 // Connect to Mongo DB
-// var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/manga";
 
-// mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGODB_URI);
+
 
 console.log("\n***********************************\n" +
     "Scrapping from Crunchyroll:" +
 "\n***********************************\n");
 
-// app.get("/scrape", function (req, res) {
-    axios.get("https://www.crunchyroll.com/").then(function (response) {
+app.get("/scrape", function (req, res) {
+    axios.get("https://www.crunchyroll.com/comics/manga").then(function (response) {
         var $ = cheerio.load(response.data);
 
-        $("li.clearfix").each(function (i, element) {
-            var results = {};
+        // console.log($(".portrait-element").children(".series-title").text())
 
-            result.title = $(element).text();
-            result.link = $(element).children("a").attr("href");
+        $(".portrait-element").each(function (i, element) {
+            var result = {};
 
-            // Save these results in an object that we'll push into the results array we defined earlier
-            results.push({
-                title: title,
-                link: link
-            });
+            result.title = $(this)
+            .children(".series-title")
+            .text();
+            result.link = "https://www.crunchyroll.com" + $(this)
+            .attr("href");
+            result.imgSrc = $(this)
+            .find($(".portrait"))
+            .attr("src")
+
+            db.Manga.create(result)
+              .then(function (dbManga) {
+                  console.log(dbManga);
+              })
+              .catch(function(err) {
+                  console.log(err);
+              });
         });
 
-        // Log the results once you've looped through each of the elements found with cheerio
-        console.log(results);
+        res.send("Scrape Complete");
     });
-// })
+});
+
+app.get("/manga", function(req, res) {
+    db.Manga.find({})
+      .then(function (dbManga) {
+          res.json(dbManga);
+      })
+      .catch(function (err) {
+          res.json(err);
+      });
+});
+
+app.listen(PORT, function() {
+    console.log("App running on port " + PORT + "!");
+});

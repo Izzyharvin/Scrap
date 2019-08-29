@@ -1,4 +1,3 @@
-module.export = {
-    article: require("./article"),
-    note: require("./note")
+module.exports = {
+    Manga: require("./manga")
 };

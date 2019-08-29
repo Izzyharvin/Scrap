@@ -2,21 +2,25 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-var ArticleSchema = new Schema({
+
+var MangaSchema = new Schema({
+    
     title: {
         type: String,
         required: true
     },
+
     link: {
         type: String,
         required: true
     },
-    note: {
-        type: Schema.Types.ObjectId,
-        ref: "Note"
+    imgSrc: {
+        type: String,
+        required: true
     }
 });
 
-var Article = mongoose.model("Article", ArticleSchema);
 
-module.exports = Article;
+var Manga = mongoose.model("Manga", MangaSchema);
+
+module.exports = Manga;
